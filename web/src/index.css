@@ -1,53 +1,56 @@
+@import "@fontsource-variable/inter";
 @import "tailwindcss";
 
 /* Dark mode por clase (CLAUDE.md): `dark:` aplica cuando <html> tiene la clase `.dark`,
    no por prefers-color-scheme directamente. El valor inicial lo decide el theme store. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Tokens de diseño shadcn/ui (paleta neutral). Se consumen vía `bg-background`, `text-foreground`, etc. */
+/* Identidad visual: acento índigo/violeta (SaaS moderno). Base fría y sutil, no gris puro. */
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --radius: 0.7rem;
+  --background: oklch(0.99 0.004 280);
+  --foreground: oklch(0.21 0.02 280);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.21 0.02 280);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --popover-foreground: oklch(0.21 0.02 280);
+  --primary: oklch(0.52 0.23 277);
+  --primary-foreground: oklch(0.985 0.01 280);
+  --secondary: oklch(0.96 0.01 280);
+  --secondary-foreground: oklch(0.26 0.02 280);
+  --muted: oklch(0.965 0.008 280);
+  --muted-foreground: oklch(0.53 0.02 280);
+  --accent: oklch(0.95 0.03 277);
+  --accent-foreground: oklch(0.38 0.13 277);
+  --destructive: oklch(0.58 0.24 27.3);
+  --destructive-foreground: oklch(0.985 0.01 280);
+  --success: oklch(0.6 0.16 155);
+  --border: oklch(0.91 0.01 280);
+  --input: oklch(0.91 0.01 280);
+  --ring: oklch(0.52 0.23 277);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 10%);
+  --background: oklch(0.17 0.015 280);
+  --foreground: oklch(0.97 0.006 280);
+  --card: oklch(0.215 0.02 280);
+  --card-foreground: oklch(0.97 0.006 280);
+  --popover: oklch(0.215 0.02 280);
+  --popover-foreground: oklch(0.97 0.006 280);
+  --primary: oklch(0.64 0.19 277);
+  --primary-foreground: oklch(0.99 0.01 280);
+  --secondary: oklch(0.27 0.02 280);
+  --secondary-foreground: oklch(0.97 0.006 280);
+  --muted: oklch(0.27 0.02 280);
+  --muted-foreground: oklch(0.71 0.02 280);
+  --accent: oklch(0.31 0.055 277);
+  --accent-foreground: oklch(0.9 0.05 277);
+  --destructive: oklch(0.7 0.19 22);
+  --destructive-foreground: oklch(0.99 0.01 280);
+  --success: oklch(0.7 0.15 155);
+  --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: oklch(0.64 0.19 277);
 }
 
 /* Mapeo de tokens a utilidades de Tailwind v4 (@theme inline). */
@@ -68,6 +71,7 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -75,6 +79,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: "Inter Variable", system-ui, -apple-system, sans-serif;
 }
 
 @layer base {
@@ -84,9 +89,17 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
     margin: 0;
     min-height: 100vh;
   }
+}
+
+/* Fondo con glow índigo sutil para pantallas de marca (login). Se adapta a light/dark. */
+@utility bg-brand-glow {
+  background-image:
+    radial-gradient(60% 55% at 50% 0%, color-mix(in oklch, var(--primary) 22%, transparent), transparent 70%),
+    radial-gradient(45% 40% at 85% 100%, color-mix(in oklch, var(--primary) 12%, transparent), transparent 70%);
 }

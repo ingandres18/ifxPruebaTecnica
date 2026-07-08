@@ -41,7 +41,7 @@ C4Container
     Person(cliente, "Cliente")
 
     System_Boundary(plataforma, "Plataforma de Gestión de VMs") {
-        Container(spa, "Single Page Application", "React 19, Vite, TypeScript", "Dark mode. Estado de servidor: TanStack Query (optimistic + rollback). Sesión/theme: Zustand")
+        Container(spa, "Single Page Application", "React 19, Vite, TypeScript", "Dark mode. Estado de servidor: TanStack Query (optimistic + rollback), incluida la sesión vía /auth/me. Zustand solo para theme")
         Container(api, "API Backend", ".NET 10, ASP.NET Core (Kestrel)", "REST + SignalR en un proceso. JWT vía cookie, autorización por rol, rate limiting, validación server-side")
         ContainerDb(db, "Base de Datos", "SQLite, EF Core", "Usuarios (BCrypt) y VMs. Migraciones + seed de prueba")
     }
@@ -112,7 +112,7 @@ C4Component
 
     Container_Boundary(spa, "Single Page Application") {
         Component(router, "Router + Guards", "React Router", "ProtectedRoute exige sesión, AdminRoute exige rol. Cliente no renderiza acciones de escritura")
-        Component(authf, "Feature: Auth", "LoginPage + session store", "Errores inline. Sesión en Zustand, rehidratada vía GET /me al recargar")
+        Component(authf, "Feature: Auth", "LoginPage + useSession", "Errores inline. Sesión = query de GET /me (fuente única), rehidratada al recargar")
         Component(vmsf, "Feature: VMs", "Listado + Formulario + hooks", "react-hook-form + zod (onChange). Mutaciones optimistas: onMutate/onError/onSettled")
         Component(dash, "Feature: Dashboard", "KPIs + Recharts", "Cores/RAM/disco de VMs activas, derivado del caché de la query")
         Component(rq, "Query Client", "TanStack Query", "Caché de estado de servidor: fuente única para listado y dashboard")

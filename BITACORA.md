@@ -37,7 +37,8 @@
 
 **Slice 2 — Auth end-to-end:**
 
-- (pendiente)
+- Defensa anti-timing en el login — además del mensaje 401 genérico (anti-enumeración del SPEC), verifico contra un hash BCrypt señuelo cuando el email no existe, para no filtrar su existencia por el tiempo de respuesta.
+
 
 **Slice 3 — CRUD + listado:**
 
@@ -71,7 +72,11 @@
 
 **Slice 2 :**
 
-- (pendiente)
+- La sesión es server state en TanStack Query (/auth/me como fuente única, hook useSession), NO un store espejo en Zustand. Resolvió el choque entre SPEC §7 y la regla "no duplicar server state" del CLAUDE.md. → Actualicé SPEC, CLAUDE y ARQUITECTURA, y añadí el trade-off al SPEC §9.
+
+- Clave JWT de dev commiteada en appsettings.Development.json (cero setup para el revisor, como pide el SPEC; en produccion iría por user-secrets/env — se documenta en el README).
+
+- Identidad visual índigo/violeta (SaaS moderno) + tipografía Inter, con pase de identidad ahora y pulido en Slice 7. → Agregué @fontsource-variable/inter (fuente self-hosted).
 
 **Slice 3:**
 - (pendiente)

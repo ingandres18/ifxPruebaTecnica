@@ -14,7 +14,7 @@ foco en seguridad (JWT en cookie HttpOnly) y autorización por roles.
 |---|---|---|
 | Frontend | React 19 + Vite + TypeScript | Ecosistema maduro, velocidad de dev, tipado end-to-end |
 | Estado servidor | TanStack Query v5 | Patrón nativo de optimistic updates con rollback (`onMutate`/`onError`/`onSettled`) |
-| Estado cliente | Zustand | Solo sesión (usuario/rol) y preferencias UI (theme). Mínimo y explícito |
+| Estado cliente | Zustand | Solo preferencias UI (theme). Mínimo y explícito. La sesión (usuario/rol) NO va aquí: es server state y vive en el query de `/auth/me` (ver §9) |
 | Router | React Router v6 | Rutas públicas/privadas con guard por autenticación |
 | UI | Tailwind CSS + shadcn/ui | Dark mode nativo por clase, componentes accesibles, estética limpia |
 | Formularios | react-hook-form + zod | Validación en tiempo real declarativa, schema compartible |
@@ -161,7 +161,7 @@ Patrón TanStack Query en cada mutación:
 /web
   /src
     /features
-      /auth      (LoginPage, useAuth, session store)
+      /auth      (LoginPage, useSession/useLogin/useLogout sobre el query de /auth/me)
       /vms       (list, form, hooks de queries/mutations, tipos)
       /dashboard (KPIs, charts)
     /components/ui   (shadcn)
@@ -374,6 +374,7 @@ y seguir tu propio README al pie de la letra, como si fuera el revisor.
 | SignalR | Socket.io + Node sidecar | Menos "estándar web agnóstico"; a cambio: integración nativa con auth por cookie y el stack .NET |
 | TanStack Query | Redux Toolkit + thunks | Menos control manual del store; a cambio: caché, invalidación y patrón optimista resueltos de fábrica |
 | Sin Idempotency-Key en POST | Claves de idempotencia estilo Stripe | Riesgo teórico de doble creación por reintento; fuera de alcance para 1 día, documentado (§10) |
+| Sesión como server state en TanStack Query (`/auth/me` como fuente única, hook `useSession`) | Session store espejo en Zustand | Un dato menos que sincronizar manualmente y se respeta la regla "no duplicar server state en Zustand" (CLAUDE.md); a cambio, leer el usuario depende del caché del query en vez de un store dedicado. Zustand queda solo para theme |
 
 ## 10. Fuera de alcance (decisión explícita, documentar en README)
 

@@ -19,7 +19,9 @@ reglas de rol y estructura. Si una instrucción mía contradice el SPEC, pregún
 ### Frontend (/web)
 - TypeScript estricto. Prohibido `any`; usa `unknown` + narrowing si hace falta.
 - Estado de servidor SOLO con TanStack Query. Prohibido copiar datos de queries a useState/Zustand.
-- Zustand únicamente para: sesión de usuario y theme.
+- Zustand únicamente para estado de cliente puro (theme). La sesión de usuario (usuario/rol) es
+  server state: vive en el query de `/auth/me` como fuente única (hook `useSession`), NO se duplica
+  en Zustand. Ver trade-off en SPEC §9.
 - Toda mutación de VMs implementa el patrón optimista completo:
   `onMutate` (cancel + snapshot + update) → `onError` (rollback + toast) → `onSettled` (invalidate).
 - Formularios con react-hook-form + zod, `mode: "onChange"` para validación en tiempo real.
