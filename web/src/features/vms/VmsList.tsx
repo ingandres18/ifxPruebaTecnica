@@ -1,5 +1,6 @@
+import { useMemo, useState } from "react"
 import { Link } from "react-router-dom"
-import { AlertCircle, Plus, ServerOff } from "lucide-react"
+import { AlertCircle, Plus, SearchX, ServerOff } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -7,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useSession } from "@/features/auth/useSession"
 
 import { VmCard } from "./VmCard"
+import { VmsFilterBar, type StatusFilter } from "./VmsFilterBar"
 import { useVms } from "./useVms"
 
 function Grid({ children }: { children: React.ReactNode }) {
@@ -16,6 +18,19 @@ function Grid({ children }: { children: React.ReactNode }) {
 export function VmsList() {
   const { isAdmin } = useSession()
   const { data: vms, isLoading, isError, refetch, isFetching } = useVms()
+
+  const [search, setSearch] = useState("")
+  const [status, setStatus] = useState<StatusFilter>("todos")
+
+  const filtered = useMemo(() => {
+    if (!vms) return []
+    const term = search.trim().toLowerCase()
+    return vms.filter((vm) => {
+      const matchesName = vm.name.toLowerCase().includes(term)
+      const matchesStatus = status === "todos" || vm.status === status
+      return matchesName && matchesStatus
+    })
+  }, [vms, search, status])
 
   if (isLoading) {
     return (
@@ -50,11 +65,35 @@ export function VmsList() {
   }
 
   return (
-    <Grid>
-      {vms.map((vm) => (
-        <VmCard key={vm.id} vm={vm} isAdmin={isAdmin} />
-      ))}
-    </Grid>
+    <div className="flex flex-col gap-4">
+      <VmsFilterBar search={search} onSearch={setSearch} status={status} onStatus={setStatus} />
+
+      {filtered.length === 0 ? (
+        <Card className="flex flex-col items-center gap-2 p-10 text-center">
+          <SearchX className="size-7 text-muted-foreground" />
+          <p className="font-medium">Sin coincidencias</p>
+          <p className="text-sm text-muted-foreground">
+            Ninguna VM coincide con la búsqueda o el filtro seleccionado.
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setSearch("")
+              setStatus("todos")
+            }}
+          >
+            Limpiar filtros
+          </Button>
+        </Card>
+      ) : (
+        <Grid>
+          {filtered.map((vm) => (
+            <VmCard key={vm.id} vm={vm} isAdmin={isAdmin} />
+          ))}
+        </Grid>
+      )}
+    </div>
   )
 }
 
