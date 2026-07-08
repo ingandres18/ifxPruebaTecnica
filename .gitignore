@@ -1,0 +1,37 @@
+# ---------- .NET ----------
+bin/
+obj/
+*.user
+*.suo
+.vs/
+# SQLite (base de datos local generada por migraciones/seed)
+*.db
+*.db-shm
+*.db-wal
+
+# ---------- Node / Frontend ----------
+node_modules/
+web/dist/
+web/dist-ssr/
+*.local
+
+# ---------- Secretos ----------
+# user-secrets viven fuera del repo; appsettings.Development.json puede contener la clave JWT de dev
+# (se documenta en README). No ignoramos appsettings.Development.json para que el revisor pueda correr sin setup,
+# pero SÍ cualquier .env real:
+.env
+.env.*
+!.env.example
+
+# ---------- Claude Code ----------
+# Permisos locales de la sesión (específicos de cada máquina); launch.json sí se versiona.
+.claude/settings.local.json
+
+# ---------- Editor / OS ----------
+.DS_Store
+.idea/
+*.swp
+
+# ---------- Logs ----------
+*.log
+npm-debug.log*

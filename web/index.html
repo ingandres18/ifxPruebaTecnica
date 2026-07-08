@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IFX · Gestión de VMs</title>
+    <!-- Anti-flash de dark mode: aplica la clase antes de que React monte, leyendo el theme
+         persistido (o prefers-color-scheme). Evita el parpadeo claro→oscuro al recargar. -->
+    <script>
+      (function () {
+        try {
+          var stored = JSON.parse(localStorage.getItem("ifx-theme") || "null");
+          var theme = stored && stored.state && stored.state.theme;
+          if (!theme) {
+            theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          }
+          if (theme === "dark") document.documentElement.classList.add("dark");
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
