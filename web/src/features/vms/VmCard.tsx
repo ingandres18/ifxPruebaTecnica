@@ -1,16 +1,29 @@
 import type { ReactNode } from "react"
-import { Cpu, HardDrive, MemoryStick, Pencil } from "lucide-react"
+import { Cpu, HardDrive, MemoryStick, Pencil, Trash2 } from "lucide-react"
 import { Link } from "react-router-dom"
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 
 import type { Vm } from "./types"
+import { useDeleteVm } from "./useVmMutations"
 import { statusConfig } from "./vmStatus"
 
 export function VmCard({ vm, isAdmin }: { vm: Vm; isAdmin: boolean }) {
   const status = statusConfig[vm.status]
+  const deleteMutation = useDeleteVm()
 
   return (
     <Card className="flex flex-col gap-4 p-5 transition-shadow hover:shadow-md">
@@ -37,7 +50,33 @@ export function VmCard({ vm, isAdmin }: { vm: Vm; isAdmin: boolean }) {
       </div>
 
       {isAdmin && (
-        <div className="flex justify-end border-t border-border pt-3">
+        <div className="flex justify-end gap-1 border-t border-border pt-3">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                <Trash2 />
+                Eliminar
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>¿Eliminar "{vm.name}"?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Esta acción no se puede deshacer. La VM se eliminará permanentemente.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  onClick={() => deleteMutation.mutate(vm.id)}
+                >
+                  Eliminar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
           <Button asChild variant="ghost" size="sm">
             <Link to={`/vms/${vm.id}/edit`}>
               <Pencil />

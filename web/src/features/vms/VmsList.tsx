@@ -27,7 +27,10 @@ export function VmsList() {
     )
   }
 
-  if (isError) {
+  // Solo mostramos el error de pantalla completa si no hay datos que enseñar. Si ya tenemos
+  // datos (p. ej. tras un rollback optimista) y el refetch de invalidateQueries falla porque la
+  // API está caída, seguimos mostrando esos datos: el toast de la mutación ya avisó del error.
+  if (isError && !vms) {
     return (
       <Card className="flex flex-col items-center gap-3 p-10 text-center">
         <AlertCircle className="size-8 text-destructive" />

@@ -46,7 +46,9 @@
 
 **Slice 4 — Formulario + Optimistic UI:**
 
-- (pendiente)
+- Navegar a / inmediatamente después de mutate(), sin esperar la respuesta del servidor — decisión de implementación no explícita en el SPEC (la UI no espera red para nada). Si hubiera esperado a onSuccess para navegar, no sería verdaderamente optimistic UI.
+
+- Agregué key={vm?.id ?? "new"} en VmForm — mejora de robustez preventiva (evita que react-hook-form arrastre valores de una VM anterior si el form no se desmonta entre ediciones).
 
 **Slice 5 — Dashboard:**
 
@@ -83,7 +85,9 @@
 
 **Slice 4:**
 
-- (pendiente)
+- Select nativo estilizado en vez de sumar el Select de shadcn (evitar una dependencia Radix extra para 2 campos).
+
+- Bug encontrado y enviado a corregir VmsList tapaba los datos revertidos con una pantalla de error cuando el invalidateQueries de fondo también fallaba.
 
 **Slice 5:**
 - (pendiente)
