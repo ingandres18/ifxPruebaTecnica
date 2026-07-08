@@ -60,8 +60,15 @@ public static class VmEndpoints
         return TypedResults.Ok<IReadOnlyList<VmResponse>>(vms);
     }
 
+    // Header con el connectionId de SignalR del cliente que origina la mutación (para excluirlo
+    // del broadcast y no re-notificar/re-animar su propia acción).
+    private const string ConnectionIdHeader = "X-Connection-Id";
+
+    private static string? ConnectionId(HttpContext http) =>
+        http.Request.Headers.TryGetValue(ConnectionIdHeader, out var value) ? value.ToString() : null;
+
     private static async Task<Results<Created<VmResponse>, ValidationProblem>> CreateAsync(
-        CreateVmRequest request, AppDbContext db, CancellationToken ct)
+        CreateVmRequest request, AppDbContext db, IVmNotifier notifier, HttpContext http, CancellationToken ct)
     {
         if (!VmValidation.TryValidate(
                 request.Name, request.Cores, request.Ram, request.Disk, request.Os, request.Status,
@@ -87,11 +94,14 @@ public static class VmEndpoints
         db.VirtualMachines.Add(vm);
         await db.SaveChangesAsync(ct);
 
-        return TypedResults.Created($"/api/vms/{vm.Id}", vm.ToResponse());
+        var response = vm.ToResponse();
+        await notifier.VmCreatedAsync(response, ConnectionId(http), ct);
+
+        return TypedResults.Created($"/api/vms/{vm.Id}", response);
     }
 
     private static async Task<Results<Ok<VmResponse>, ValidationProblem, NotFound>> UpdateAsync(
-        Guid id, UpdateVmRequest request, AppDbContext db, CancellationToken ct)
+        Guid id, UpdateVmRequest request, AppDbContext db, IVmNotifier notifier, HttpContext http, CancellationToken ct)
     {
         var vm = await db.VirtualMachines.FirstOrDefaultAsync(v => v.Id == id, ct);
         if (vm is null) return TypedResults.NotFound();
@@ -113,17 +123,22 @@ public static class VmEndpoints
 
         await db.SaveChangesAsync(ct);
 
-        return TypedResults.Ok(vm.ToResponse());
+        var response = vm.ToResponse();
+        await notifier.VmUpdatedAsync(response, ConnectionId(http), ct);
+
+        return TypedResults.Ok(response);
     }
 
     private static async Task<Results<NoContent, NotFound>> DeleteAsync(
-        Guid id, AppDbContext db, CancellationToken ct)
+        Guid id, AppDbContext db, IVmNotifier notifier, HttpContext http, CancellationToken ct)
     {
         var vm = await db.VirtualMachines.FirstOrDefaultAsync(v => v.Id == id, ct);
         if (vm is null) return TypedResults.NotFound();
 
         db.VirtualMachines.Remove(vm);
         await db.SaveChangesAsync(ct);
+
+        await notifier.VmDeletedAsync(id, ConnectionId(http), ct);
 
         return TypedResults.NoContent();
     }

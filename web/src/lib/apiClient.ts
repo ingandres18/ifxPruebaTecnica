@@ -3,6 +3,8 @@
  * viaja sola. El frontend NUNCA maneja el token. Los errores se normalizan desde ProblemDetails.
  */
 
+import { getConnectionId } from "./signalr"
+
 const BASE = "/api"
 
 /** Forma de un error RFC 7807 devuelto por el backend. */
@@ -29,9 +31,17 @@ export class ApiError extends Error {
 export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const { headers, ...rest } = options
 
+  // Adjuntamos el connectionId de SignalR (si hay conexión): el backend excluye a esta conexión
+  // del broadcast en las mutaciones, evitando el eco de la propia acción.
+  const connectionId = getConnectionId()
+
   const response = await fetch(`${BASE}${path}`, {
     credentials: "include",
-    headers: { "Content-Type": "application/json", ...headers },
+    headers: {
+      "Content-Type": "application/json",
+      ...(connectionId ? { "X-Connection-Id": connectionId } : {}),
+      ...headers,
+    },
     ...rest,
   })
 

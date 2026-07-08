@@ -62,7 +62,9 @@
 
 **Slice 6 — Real-time (SignalR):**
 
-- (pendiente)
+- Exclusión del eco por connectionId en el servidor (Clients.AllExcept) en vez de dedup en cliente — más robusto (propuesto por la IA, lo aprobe).
+
+-  Refactor de la conexión para no reiniciarla en cada cleanup (cierre solo en logout) — eliminó el error de consola del doble-montaje de StrictMode.
 
 **Slice 7 — Cierre:**
 
@@ -109,7 +111,7 @@
 
 **Slice 6:**
 
-- (pendiente)
+- Aprobe el enfoque del plan (exclusión en servidor, payload VM/id, tests manuales documentados).
 
 **Slice 7:**
 - (pendiente)

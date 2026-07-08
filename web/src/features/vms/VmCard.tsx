@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { useHighlightStore } from "@/stores/highlightStore"
 import { cn } from "@/lib/utils"
 
 import type { Vm } from "./types"
@@ -24,9 +25,16 @@ import { statusConfig } from "./vmStatus"
 export function VmCard({ vm, isAdmin }: { vm: Vm; isAdmin: boolean }) {
   const status = statusConfig[vm.status]
   const deleteMutation = useDeleteVm()
+  // Resaltado breve cuando la VM cambió por un evento real-time de otro cliente.
+  const highlighted = useHighlightStore((s) => s.ids.has(vm.id))
 
   return (
-    <Card className="flex flex-col gap-4 p-5 transition-shadow hover:shadow-md">
+    <Card
+      className={cn(
+        "flex flex-col gap-4 p-5 transition-shadow hover:shadow-md",
+        highlighted && "vm-flash",
+      )}
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <h3 className="truncate font-semibold">{vm.name}</h3>

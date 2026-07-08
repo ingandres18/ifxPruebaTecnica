@@ -19,13 +19,13 @@ export function VmFormPage({ mode }: { mode: "create" | "edit" }) {
   const vm = mode === "edit" ? vms?.find((v) => v.id === id) : undefined
 
   if (mode === "edit" && !isLoading && !vm) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/vms" replace />
   }
 
   return (
     <div className="mx-auto flex max-w-lg flex-col gap-4">
       <Button asChild variant="ghost" size="sm" className="self-start">
-        <Link to="/">
+        <Link to="/vms">
           <ArrowLeft />
           Volver
         </Link>

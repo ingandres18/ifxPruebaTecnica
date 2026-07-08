@@ -60,7 +60,7 @@ export function VmForm({ mode, vm }: { mode: "create" | "edit"; vm?: Vm }) {
     } else if (vm) {
       updateMutation.mutate({ id: vm.id, input: values })
     }
-    navigate("/")
+    navigate("/vms")
   })
 
   const isPending = createMutation.isPending || updateMutation.isPending

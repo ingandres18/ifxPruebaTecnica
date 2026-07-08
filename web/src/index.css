@@ -103,3 +103,17 @@
     radial-gradient(60% 55% at 50% 0%, color-mix(in oklch, var(--primary) 22%, transparent), transparent 70%),
     radial-gradient(45% 40% at 85% 100%, color-mix(in oklch, var(--primary) 12%, transparent), transparent 70%);
 }
+
+/* Resaltado real-time: ring índigo que aparece y se desvanece (~1.5s) cuando una VM cambia
+   por un evento de otro cliente. */
+@keyframes vm-flash {
+  0% {
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 60%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 3px transparent;
+  }
+}
+.vm-flash {
+  animation: vm-flash 1.5s ease-out;
+}

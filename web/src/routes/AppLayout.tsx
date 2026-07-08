@@ -4,6 +4,7 @@ import { Menu } from "lucide-react"
 
 import { Brand } from "@/components/brand"
 import { Button } from "@/components/ui/button"
+import { useRealtimeVms } from "@/features/vms/useRealtimeVms"
 import { useUiStore } from "@/stores/uiStore"
 import { cn } from "@/lib/utils"
 import { Sidebar } from "./Sidebar"
@@ -16,6 +17,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const collapsed = useUiStore((s) => s.sidebarCollapsed)
   const toggleSidebar = useUiStore((s) => s.toggleSidebar)
+
+  // Conexión real-time mientras haya sesión (este layout solo se monta autenticado).
+  useRealtimeVms()
 
   return (
     <div className="min-h-screen bg-background text-foreground">

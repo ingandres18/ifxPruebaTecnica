@@ -3,6 +3,7 @@ using System.Threading.RateLimiting;
 using Api.Auth;
 using Api.Common;
 using Api.Data;
+using Api.Hubs;
 using Api.Vms;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
@@ -20,6 +21,10 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connect
 
 // OpenAPI nativo (documento) + Scalar (UI interactiva) para que se pruebe la API sin curl.
 builder.Services.AddOpenApi();
+
+// SignalR (tiempo real) + servicio que publica eventos de VMs tras persistir.
+builder.Services.AddSignalR();
+builder.Services.AddScoped<IVmNotifier, VmNotifier>();
 
 // Errores en formato ProblemDetails (RFC 7807) en toda la app.
 builder.Services.AddProblemDetails();
@@ -104,6 +109,9 @@ app.MapGet("/", () => Results.Ok(new { status = "ok", service = "ifx-vms-api" })
 // Features (vertical slices).
 app.MapAuthEndpoints();
 app.MapVmEndpoints();
+
+// Hub de tiempo real, autenticado por la cookie (mismo esquema que el resto).
+app.MapHub<VmsHub>("/hubs/vms").RequireAuthorization();
 
 // Aplica migraciones y siembra datos al arrancar (cero setup para el revisor).
 using (var scope = app.Services.CreateScope())

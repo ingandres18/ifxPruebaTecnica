@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import { ApiError } from "@/lib/apiClient"
+import { resetConnection } from "@/lib/signalr"
 import { fetchMe, login, logout } from "./api"
 import type { SessionUser } from "./types"
 
@@ -49,8 +50,9 @@ export function useLogout() {
     mutationFn: logout,
     onSuccess: () => {
       queryClient.setQueryData(sessionKey, null)
-      // Limpia el resto del caché de servidor al cerrar sesión (VMs llegan en el slice 3).
+      // Limpia el caché de VMs y cierra la conexión real-time al cerrar sesión.
       queryClient.removeQueries({ queryKey: ["vms"] })
+      void resetConnection()
     },
   })
 }
