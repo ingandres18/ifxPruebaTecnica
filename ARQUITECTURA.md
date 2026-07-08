@@ -111,7 +111,7 @@ C4Component
     Container(api, "API Backend", ".NET 10", "")
 
     Container_Boundary(spa, "Single Page Application") {
-        Component(router, "Router + Guards", "React Router", "ProtectedRoute exige sesión, AdminRoute exige rol. Cliente no renderiza acciones de escritura")
+        Component(router, "Router + Guards + Sidebar", "React Router", "Sidebar (drawer en móvil) separa Dashboard (/) de VMs (/vms). ProtectedRoute exige sesión, AdminRoute exige rol. Cliente no renderiza acciones de escritura")
         Component(authf, "Feature: Auth", "LoginPage + useSession", "Errores inline. Sesión = query de GET /me (fuente única), rehidratada al recargar")
         Component(vmsf, "Feature: VMs", "Listado + Formulario + hooks", "react-hook-form + zod (onChange). Mutaciones optimistas: onMutate/onError/onSettled")
         Component(dash, "Feature: Dashboard", "KPIs + Recharts", "Cores/RAM/disco de VMs activas, derivado del caché de la query")

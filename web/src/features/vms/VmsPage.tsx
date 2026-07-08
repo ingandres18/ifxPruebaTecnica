@@ -6,7 +6,7 @@ import { useSession } from "@/features/auth/useSession"
 
 import { VmsList } from "./VmsList"
 
-/** Ruta "/" (SPEC §6). En Slice 5 se añadirán arriba los KPIs y charts del dashboard. */
+/** Ruta "/vms" (SPEC §6): gestión de máquinas virtuales (listado + acciones). */
 export function VmsPage() {
   const { isAdmin } = useSession()
 

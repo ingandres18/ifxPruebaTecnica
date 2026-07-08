@@ -52,7 +52,13 @@
 
 **Slice 5 — Dashboard:**
 
-- (pendiente)
+- Comparación activo vs aprovisionado con barra de utilización 
+
+- Manejo de dark mode en Recharts (currentColor + tooltip custom + color estable por OS)
+
+- Sidebar responsive con drawer móvil sin librería extra.
+
+- Filtrado client-side reactivo con empty state; colapso persistido en uiStore.
 
 **Slice 6 — Real-time (SignalR):**
 
@@ -90,7 +96,16 @@
 - Bug encontrado y enviado a corregir VmsList tapaba los datos revertidos con una pantalla de error cuando el invalidateQueries de fondo también fallaba.
 
 **Slice 5:**
-- (pendiente)
+
+- Alcance rico (4 KPIs + utilización + charts + panel extra), verlo antes de decidir.
+
+- Cambiar panel extra "RAM por máquina" → "Memoria por OS" (menos redundante).
+
+- Separar Dashboard y VMs en secciones con sidebar (charts + listado juntos se veía saturado); actualizar SPEC/ARQUITECTURA.
+
+- Agregar filtro (nombre + estado) en el listado.
+
+- Hacer el sidebar colapsable.
 
 **Slice 6:**
 

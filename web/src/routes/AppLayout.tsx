@@ -1,66 +1,68 @@
 import type { ReactNode } from "react"
-import { LogOut } from "lucide-react"
-import { useNavigate } from "react-router-dom"
-import { toast } from "sonner"
+import { useState } from "react"
+import { Menu } from "lucide-react"
 
 import { Brand } from "@/components/brand"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
-import { useLogout, useSession } from "@/features/auth/useSession"
+import { useUiStore } from "@/stores/uiStore"
+import { cn } from "@/lib/utils"
+import { Sidebar } from "./Sidebar"
 
-/** Layout de las páginas autenticadas: header sticky con marca, usuario, theme toggle y logout. */
+/**
+ * Layout de las páginas autenticadas: sidebar de navegación (fijo en desktop, drawer en móvil)
+ * que separa el Dashboard de la gestión de VMs. En desktop el sidebar es colapsable a rail.
+ */
 export function AppLayout({ children }: { children: ReactNode }) {
-  const { user, isAdmin } = useSession()
-  const logoutMutation = useLogout()
-  const navigate = useNavigate()
-
-  const handleLogout = () => {
-    logoutMutation.mutate(undefined, {
-      onSuccess: () => navigate("/login", { replace: true }),
-      onError: () => toast.error("No se pudo cerrar sesión"),
-    })
-  }
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const collapsed = useUiStore((s) => s.sidebarCollapsed)
+  const toggleSidebar = useUiStore((s) => s.toggleSidebar)
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-10 border-b border-border/70 bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
-          <Brand />
-          <div className="flex items-center gap-2 sm:gap-3">
-            {user && (
-              <div className="hidden items-center gap-2 sm:flex">
-                <div className="text-right leading-tight">
-                  <p className="text-sm font-medium">{user.email}</p>
-                  <span
-                    className={
-                      isAdmin
-                        ? "text-xs font-medium text-primary"
-                        : "text-xs text-muted-foreground"
-                    }
-                  >
-                    {isAdmin ? "Administrador" : "Cliente"}
-                  </span>
-                </div>
-                <span className="grid size-9 place-items-center rounded-full bg-accent text-sm font-semibold text-accent-foreground">
-                  {user.email.charAt(0).toUpperCase()}
-                </span>
-              </div>
-            )}
-            <ThemeToggle />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleLogout}
-              disabled={logoutMutation.isPending}
-            >
-              <LogOut />
-              <span className="hidden sm:inline">Salir</span>
-            </Button>
-          </div>
-        </div>
-      </header>
+      {/* Sidebar fijo (desktop), ancho según estado de colapso */}
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-40 hidden border-r border-border bg-card/40 transition-[width] duration-200 md:block",
+          collapsed ? "w-16" : "w-60",
+        )}
+      >
+        <Sidebar collapsed={collapsed} onToggleCollapse={toggleSidebar} />
+      </aside>
 
-      <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>
+      {/* Sidebar como drawer (móvil): siempre expandido */}
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 w-64 border-r border-border bg-card shadow-xl transition-transform duration-200 md:hidden",
+          mobileOpen ? "translate-x-0" : "-translate-x-full",
+        )}
+      >
+        <Sidebar onNavigate={() => setMobileOpen(false)} />
+      </aside>
+      {mobileOpen && (
+        <button
+          type="button"
+          aria-label="Cerrar menú"
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Contenido, con padding izquierdo según el ancho del sidebar */}
+      <div className={cn("transition-[padding] duration-200", collapsed ? "md:pl-16" : "md:pl-60")}>
+        <header className="flex items-center gap-3 border-b border-border px-4 py-3 md:hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setMobileOpen(true)}
+            aria-label="Abrir menú"
+          >
+            <Menu />
+          </Button>
+          <Brand />
+        </header>
+
+        <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">{children}</main>
+      </div>
     </div>
   )
 }

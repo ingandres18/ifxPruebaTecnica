@@ -113,10 +113,15 @@ Errores en formato ProblemDetails (RFC 7807). Validación server-side con las mi
 
 ## 6. Frontend — rutas y comportamiento
 
+La app autenticada usa un **sidebar de navegación** (fijo en desktop, drawer en móvil) que separa
+el Dashboard de la gestión de VMs en secciones/rutas distintas (decisión de UX; el listado y los
+charts en una sola página se veía saturado — ver §9).
+
 | Ruta | Acceso | Contenido |
 |---|---|---|
 | `/login` | pública | Form email+password, errores inline, redirige a `/` si ya hay sesión |
-| `/` (Dashboard) | privada | Panel de recursos (charts) + listado de VMs |
+| `/` (Dashboard) | privada | Panel de recursos: KPIs + charts (sin listado) |
+| `/vms` | privada | Gestión de máquinas virtuales: listado + acciones |
 | `/vms/new` | privada **solo Admin** | Formulario de creación |
 | `/vms/{id}/edit` | privada **solo Admin** | Formulario de edición |
 
@@ -126,8 +131,10 @@ Errores en formato ProblemDetails (RFC 7807). Validación server-side con las mi
 - Guard de ruta: si Cliente navega manualmente a `/vms/new` → redirect a `/` con toast informativo.
 
 ### Dashboard de recursos
-- Suma de Cores, RAM y Disco de las VMs **activas** (Status = Encendida).
-- 3 tarjetas KPI + gráfico Recharts (barras o donut por OS/estado).
+- Suma de Cores, RAM y Disco de las VMs **activas** (Status = Encendida), comparada contra lo
+  aprovisionado (todas) vía un indicador de utilización por KPI.
+- 4 tarjetas KPI (VMs activas + cores/RAM/disco) + charts Recharts: donut por estado, barras por
+  OS y RAM aprovisionada por OS.
 - Se recalcula reactivo desde el cache de la query de VMs (sin endpoint extra).
 
 ### Optimistic UI (crear / editar / eliminar)
@@ -375,6 +382,7 @@ y seguir tu propio README al pie de la letra, como si fuera el revisor.
 | TanStack Query | Redux Toolkit + thunks | Menos control manual del store; a cambio: caché, invalidación y patrón optimista resueltos de fábrica |
 | Sin Idempotency-Key en POST | Claves de idempotencia estilo Stripe | Riesgo teórico de doble creación por reintento; fuera de alcance para 1 día, documentado (§10) |
 | Sesión como server state en TanStack Query (`/auth/me` como fuente única, hook `useSession`) | Session store espejo en Zustand | Un dato menos que sincronizar manualmente y se respeta la regla "no duplicar server state en Zustand" (CLAUDE.md); a cambio, leer el usuario depende del caché del query en vez de un store dedicado. Zustand queda solo para theme |
+| Sidebar con Dashboard y VMs en rutas separadas | Charts + listado juntos en `/` (como decía el SPEC original) | Más superficie de layout (sidebar responsive con drawer móvil); a cambio, cada sección respira, no hay scroll saturado y la app se percibe como un producto real. Ajuste de UX tras ver ambos paneles en una sola página |
 
 ## 10. Fuera de alcance (decisión explícita, documentar en README)
 
