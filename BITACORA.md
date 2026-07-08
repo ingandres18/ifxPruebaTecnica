@@ -42,7 +42,7 @@
 
 **Slice 3 — CRUD + listado:**
 
-- (pendiente)
+- Rate limit del login configurable vía appsettings (RateLimiting:LoginPermitLimit) — necesario para que los tests de integración con múltiples logins seguidos no chocaran con el límite de 5/min; en tests se desactiva con un valor alto.
 
 **Slice 4 — Formulario + Optimistic UI:**
 
@@ -79,7 +79,7 @@
 - Identidad visual índigo/violeta (SaaS moderno) + tipografía Inter, con pase de identidad ahora y pulido en Slice 7. → Agregué @fontsource-variable/inter (fuente self-hosted).
 
 **Slice 3:**
-- (pendiente)
+- Frontera 3↔4: rutas /vms/new y /vms/:id/edit + AdminRoute guard reales en el Slice 3 (formulario placeholder), y todas las mutaciones optimistas (crear/editar/eliminar) juntas en el Slice 4 para implementar el patrón una sola vez.
 
 **Slice 4:**
 

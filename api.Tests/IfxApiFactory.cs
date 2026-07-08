@@ -26,6 +26,8 @@ public class IfxApiFactory : WebApplicationFactory<Program>
     {
         // Development: Secure=false en la cookie (para poder inspeccionarla en el test).
         builder.UseEnvironment("Development");
+        // Sin rate limit en tests: varios logins seguidos no deben disparar 429.
+        builder.UseSetting("RateLimiting:LoginPermitLimit", "100000");
 
         builder.ConfigureServices(services =>
         {

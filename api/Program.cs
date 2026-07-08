@@ -3,6 +3,7 @@ using System.Threading.RateLimiting;
 using Api.Auth;
 using Api.Common;
 using Api.Data;
+using Api.Vms;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -58,9 +59,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             },
         };
     });
-builder.Services.AddAuthorization();
+// Autorización por rol: las mutaciones de VMs exigen Administrador (SPEC §4).
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy(VmEndpoints.AdminPolicy, policy => policy.RequireRole("Administrador"));
 
 // --- Rate limiting en /login: 5 intentos/min por IP → 429 (SPEC §4) ---
+// El límite es configurable para que los tests de integración no choquen con él.
+var loginPermitLimit = builder.Configuration.GetValue("RateLimiting:LoginPermitLimit", 5);
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -69,7 +74,7 @@ builder.Services.AddRateLimiter(options =>
             partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
             factory: _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 5,
+                PermitLimit = loginPermitLimit,
                 Window = TimeSpan.FromMinutes(1),
             }));
 });
@@ -98,6 +103,7 @@ app.MapGet("/", () => Results.Ok(new { status = "ok", service = "ifx-vms-api" })
 
 // Features (vertical slices).
 app.MapAuthEndpoints();
+app.MapVmEndpoints();
 
 // Aplica migraciones y siembra datos al arrancar (cero setup para el revisor).
 using (var scope = app.Services.CreateScope())
