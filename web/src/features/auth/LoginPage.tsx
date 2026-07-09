@@ -11,6 +11,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ApiError } from "@/lib/apiClient"
+import { usePageTitle } from "@/lib/usePageTitle"
 
 import { loginSchema, type LoginValues } from "./loginSchema"
 import { useLogin, useSession } from "./useSession"
@@ -19,6 +20,7 @@ export function LoginPage() {
   const { isAuthenticated, isLoading } = useSession()
   const loginMutation = useLogin()
   const navigate = useNavigate()
+  usePageTitle("Iniciar sesión")
 
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),

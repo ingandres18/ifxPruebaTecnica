@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 import { useState } from "react"
 import { Menu } from "lucide-react"
+import { useLocation } from "react-router-dom"
 
 import { Brand } from "@/components/brand"
 import { Button } from "@/components/ui/button"
@@ -17,6 +18,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const collapsed = useUiStore((s) => s.sidebarCollapsed)
   const toggleSidebar = useUiStore((s) => s.toggleSidebar)
+  const location = useLocation()
 
   // Conexión real-time mientras haya sesión (este layout solo se monta autenticado).
   useRealtimeVms()
@@ -65,7 +67,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <Brand />
         </header>
 
-        <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">{children}</main>
+        {/* key por ruta: re-dispara la animación de entrada al navegar entre secciones. */}
+        <main key={location.pathname} className="mx-auto max-w-6xl animate-fade-rise px-4 py-8 sm:px-6">
+          {children}
+        </main>
       </div>
     </div>
   )

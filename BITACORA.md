@@ -68,7 +68,7 @@
 
 **Slice 7 — Cierre:**
 
-- (pendiente)
+- Decisiones en cuanto a pulido en general y favicon de marca, animación de entrada por página, título dinámico por ruta, toasts theme-aware, hover en tarjetas y verificación con clon limpio simulado.
 
 ## 4. Dónde intervine yo (correcciones de rumbo y decisiones humanas, por slice)
 
@@ -114,23 +114,42 @@
 - Aprobe el enfoque del plan (exclusión en servidor, payload VM/id, tests manuales documentados).
 
 **Slice 7:**
-- (pendiente)
+
+- Documentacion de README y que y como lo debe incluir
+
+- Solicitudes end to end de nuevo, y mejoras en la UI que me parecieron importantes de hacer
+
+- Creacion de Error Boundary con fallback
 
 ## 5. Prompts clave
 
 
-### Prompt 1 — (título pendiente)
+### Prompt 1 
 
 ```text
-(pendiente)
+Antes de escribir código, propón un plan corto para el slice de autenticación y
+espera mi aprobación. Reglas no negociables:
+- El JWT va EXCLUSIVAMENTE en cookie HttpOnly + Secure + SameSite. Nunca en el body
+  de la respuesta ni en localStorage. /login solo devuelve { id, email, role }.
+- La autorización por rol se aplica en el backend con [Authorize(Roles=...)]; ocultar
+  botones en la UI es cosmético, no el mecanismo de seguridad.
+- El endurecimiento (rate limiting en /login, respuestas anti-enumeración, headers de
+  seguridad, clave JWT desde config) va EN ESTE slice, no "para después".
+  Dime también dónde vive la sesión en el frontend y por qué.
 ```
 
-**Por qué funcionó:** (pendiente)
+**Por qué funcionó:** Forzar un plan antes de código en el slice de mayor riesgo, con las reglas de seguridad como restricciones duras, evitó el error clásico de devolver el token en el body y dejó el endurecimiento incluido desde el inicio en lugar de como un "extra" opcional.
 
-### Prompt 2 — (título pendiente)
+### Prompt 2 
 
 ```text
-(pendiente)
+Plan corto para el real-time con SignalR antes de codificar. Requisitos:
+- El hub se autentica con la MISMA cookie (nada de token en query string).
+- Los eventos VmCreated/VmUpdated/VmDeleted se emiten SOLO después de persistir.
+- Lo crítico: el cliente que originó la mutación ya actualizó por optimistic UI, así
+  que NO debe recibir el eco de su propia acción (ni duplicar la VM ni re-animarla).
+  Propón la forma más robusta de evitar ese eco y dime el trade-off frente a la
+  alternativa antes de implementar.
 ```
 
-**Por qué funcionó:** (pendiente)
+**Por qué funcionó:** Anticipé el bug sutil (el eco de la propia mutación) y pedí explícitamente resolverlo de forma robusta con su trade-off. Eso llevó a excluir la conexión originadora en el servidor (Clients.AllExcept por connectionId) en vez de un dedup frágil en el cliente.

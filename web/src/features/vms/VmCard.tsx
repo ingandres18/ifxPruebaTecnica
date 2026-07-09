@@ -31,7 +31,7 @@ export function VmCard({ vm, isAdmin }: { vm: Vm; isAdmin: boolean }) {
   return (
     <Card
       className={cn(
-        "flex flex-col gap-4 p-5 transition-shadow hover:shadow-md",
+        "flex flex-col gap-4 p-5 transition-all hover:border-primary/30 hover:shadow-md",
         highlighted && "vm-flash",
       )}
     >

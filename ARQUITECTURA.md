@@ -41,7 +41,7 @@ C4Container
     Person(cliente, "Cliente")
 
     System_Boundary(plataforma, "Plataforma de Gestión de VMs") {
-        Container(spa, "Single Page Application", "React 19, Vite, TypeScript", "Dark mode. Estado de servidor: TanStack Query (optimistic + rollback), incluida la sesión vía /auth/me. Zustand solo para theme")
+        Container(spa, "Single Page Application", "React 19, Vite, TypeScript", "Dark mode. Estado de servidor: TanStack Query (optimistic + rollback), incluida la sesión vía /auth/me. Zustand para preferencias de cliente: theme, sidebar y resaltado real-time")
         Container(api, "API Backend", ".NET 10, ASP.NET Core (Kestrel)", "REST + SignalR en un proceso. JWT vía cookie, autorización por rol, rate limiting, validación server-side")
         ContainerDb(db, "Base de Datos", "SQLite, EF Core", "Usuarios (BCrypt) y VMs. Migraciones + seed de prueba")
     }
@@ -75,7 +75,7 @@ C4Component
     ContainerDb(db, "SQLite", "EF Core", "")
 
     Container_Boundary(api, "API Backend") {
-        Component(pipeline, "Middleware Pipeline", "ASP.NET Core", "JWT desde cookie: valida firma/expiración, resuelve rol. Rate limiting en /login. ProblemDetails global")
+        Component(pipeline, "Middleware Pipeline", "ASP.NET Core", "JWT desde cookie: valida firma/expiración, resuelve rol. Rate limiting en /login. Headers de seguridad (nosniff, X-Frame-Options, Referrer-Policy). ProblemDetails global")
         Component(auth, "Feature: Auth", "Minimal API endpoints", "POST /login (BCrypt + Set-Cookie), GET /me, POST /logout. Respuestas anti-enumeración")
         Component(vms, "Feature: VMs", "Minimal API + validadores", "CRUD con [Authorize(Roles)]: mutación solo Admin, lectura Admin y Cliente")
         Component(notifier, "VM Notifier", "Servicio", "Traduce mutaciones persistidas en eventos de dominio")
@@ -116,7 +116,7 @@ C4Component
         Component(vmsf, "Feature: VMs", "Listado + Formulario + hooks", "react-hook-form + zod (onChange). Mutaciones optimistas: onMutate/onError/onSettled")
         Component(dash, "Feature: Dashboard", "KPIs + Recharts", "Cores/RAM/disco de VMs activas, derivado del caché de la query")
         Component(rq, "Query Client", "TanStack Query", "Caché de estado de servidor: fuente única para listado y dashboard")
-        Component(srclient, "SignalR Client", "@microsoft/signalr", "Actualiza el caché (setQueryData) por evento, ignora eco propio, reconecta")
+        Component(srclient, "SignalR Client", "@microsoft/signalr", "Actualiza el caché (setQueryData) por evento; el servidor excluye al originador vía connectionId (no recibe su propio eco); reconexión automática")
         Component(ui, "UI Kit", "shadcn/ui + Tailwind", "Dark mode por clase, toasts, componentes accesibles")
     }
 
@@ -157,7 +157,7 @@ sequenceDiagram
         API->>API: Firmar JWT (clave desde configuración)
         API-->>SPA: 200 {id, email, role}<br/>Set-Cookie: token (HttpOnly, Secure, SameSite=Strict)
         Note over SPA: El body NO contiene el token.<br/>JS no puede leer la cookie.
-        SPA->>SPA: Guardar {usuario, rol} en Zustand
+        SPA->>SPA: Guardar {usuario, rol} en el caché de TanStack Query (query /auth/me)
         SPA->>U: Redirige al Dashboard
     else Credenciales inválidas o usuario inexistente
         API-->>SPA: 401 "Credenciales inválidas" (mensaje genérico, anti-enumeración)
@@ -188,17 +188,18 @@ sequenceDiagram
     A->>Q1: Cambia estado de VM (Apagada → Encendida)
     Q1->>Q1: onMutate: cancelar queries, snapshot del caché,<br/>aplicar cambio optimista
     Note over A: La UI refleja el cambio<br/>INMEDIATAMENTE
-    Q1->>API: PUT /api/vms/{id} (cookie automática)
+    Q1->>API: PUT /api/vms/{id}<br/>(cookie + header X-Connection-Id)
     API->>API: Middleware: rol = Administrador ✓
     API->>DB: Persistir cambio
 
     alt Éxito
         DB-->>API: OK
-        API->>HUB: Publicar VmUpdated (tras persistir)
+        API->>HUB: Publicar VmUpdated (tras persistir)<br/>a todos EXCEPTO la conexión originadora
         API-->>Q1: 200
         Q1->>Q1: onSettled: invalidateQueries (reconciliar)
+        Note over Q1: El originador NO recibe el evento<br/>(su conexión fue excluida): no duplica ni re-anima
         HUB-->>Q2: VmUpdated {vm}
-        Q2->>Q2: setQueryData + verificar que no es eco propio
+        Q2->>Q2: setQueryData (Q2 no es el originador)
         Q2->>C: Tarjeta actualizada con animación de resaltado
     else Falla (red caída / 4xx / 5xx)
         API-->>Q1: Error

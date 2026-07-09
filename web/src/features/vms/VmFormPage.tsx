@@ -4,6 +4,7 @@ import { Link, Navigate, useParams } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { usePageTitle } from "@/lib/usePageTitle"
 
 import { VmForm } from "./VmForm"
 import { useVms } from "./useVms"
@@ -15,6 +16,7 @@ import { useVms } from "./useVms"
 export function VmFormPage({ mode }: { mode: "create" | "edit" }) {
   const { id } = useParams()
   const { data: vms, isLoading } = useVms()
+  usePageTitle(mode === "create" ? "Nueva VM" : "Editar VM")
 
   const vm = mode === "edit" ? vms?.find((v) => v.id === id) : undefined
 

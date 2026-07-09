@@ -1,7 +1,10 @@
+import { usePageTitle } from "@/lib/usePageTitle"
 import { DashboardSection } from "./DashboardSection"
 
 /** Ruta "/" (SPEC §6): panel de recursos (KPIs + charts), separado de la gestión de VMs. */
 export function DashboardPage() {
+  usePageTitle("Dashboard")
+
   return (
     <div className="flex flex-col gap-6">
       <div>

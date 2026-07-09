@@ -117,3 +117,20 @@
 .vm-flash {
   animation: vm-flash 1.5s ease-out;
 }
+
+/* Entrada suave del contenido de cada página (fade + leve subida). */
+@keyframes fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .animate-fade-rise {
+    animation: fade-rise 0.35s ease-out;
+  }
+}

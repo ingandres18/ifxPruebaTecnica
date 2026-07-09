@@ -3,12 +3,14 @@ import { Link } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
 import { useSession } from "@/features/auth/useSession"
+import { usePageTitle } from "@/lib/usePageTitle"
 
 import { VmsList } from "./VmsList"
 
 /** Ruta "/vms" (SPEC §6): gestión de máquinas virtuales (listado + acciones). */
 export function VmsPage() {
   const { isAdmin } = useSession()
+  usePageTitle("Máquinas virtuales")
 
   return (
     <div className="flex flex-col gap-6">
